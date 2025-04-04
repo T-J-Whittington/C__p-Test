@@ -18,7 +18,7 @@ update:
 	docker compose exec interest-account-library composer update
 
 run-test:
-	docker compose exec interest-account-library vendor/bin/phpunit
+	docker compose exec interest-account-library vendor/bin/phpunit tests/
 
 lint:
 	docker compose exec interest-account-library vendor/bin/phpcs --standard=PSR12 src/

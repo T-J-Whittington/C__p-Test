@@ -2,7 +2,7 @@
 
 composer.lock
 
-phpunit.*.cache
+.phpunit.*.cache
 
 /.vscode/
 

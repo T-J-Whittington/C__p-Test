@@ -7,7 +7,12 @@
     },
     "autoload": {
         "psr-4": {
-            "chip-test\\": "src/"
+            "ChipTest\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ChipTest\\Tests\\": "tests/"
         }
     },
     "require-dev": {
