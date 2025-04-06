@@ -16,6 +16,9 @@ class InterestAccount {
         ]
     ];
 
+    private const DEPOSIT_TRANSACTION = 'Deposit';
+    private const INTEREST_TRANSACTION = 'Interest';
+
     /**
      * Array of interest rates for different tiers of income.
      * 
@@ -195,12 +198,18 @@ class InterestAccount {
     }
 
     /**
-     * Deposit/add funds to the current savings account.
+     * Deposit/add funds to the current savings account. Logs transaction.
      * @param int $funds Funds to be deposited.
+     * @param bool $fromInterest Whether the deposit function is called by the interest function.
      * @return $account
      */
-    public function depositFunds(int $funds) {
+    public function depositFunds(int $funds, bool $fromInterest = false) {
         $this->balance += $funds;
+
+        $this->logNewTransaction(
+            $fromInterest ? $this::INTEREST_TRANSACTION : $this::DEPOSIT_TRANSACTION, 
+            $funds
+        );
 
         return $this->getAccount();
     }
@@ -253,7 +262,6 @@ class InterestAccount {
                 // Round down partial pennies to 0.
                 $interest = floor($interest);
                 $this->balance += $interest;
-                $this->logInterestTransaction($interest);
                 $this->delayedInterest = 0;
             } else {
                 $this->delayedInterest = $interest;
@@ -287,26 +295,27 @@ class InterestAccount {
         return $threeDayRate;
     }
 
-    private array $interestTransactions = [];
+    private array $newTransactions = [];
 
     /**
-     * Log an interest transaction.
+     * Log a transaction.
      *
      * @param int $interest
+     * @param string $type
      * @return void
      */
-    private function logInterestTransaction($interest) {
-        array_push($this->interestTransactions, ['Interest', $interest]);
+    private function logNewTransaction($interest, $type) {
+        array_push($this->newTransactions, [$type, $interest]);
     }
 
     /**
-     * List all of an account's transactions, including interest payments.
+     * List all of an account's transactions, including interest/deposit payments.
      * @param ?array $existingTransactions A list of the account's existing transactions.
      * @return array()
      */
     public function listTransactions($existingTransactions = []) {
 
-        return array_push($existingTransactions, $this->interestTransactions);
+        return array_push($existingTransactions, $this->newTransactions);
     }
 
     /**
