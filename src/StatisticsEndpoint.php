@@ -9,44 +9,59 @@ namespace ChipTest;
 class StatisticsEndpoint {
 
     // Mock user accounts.
+    // According to the Stastics API doc, successes return only ID and Income.
+    // Errors only return a not-200 code and a message.
+
+    /*
+     * API response examples: 
+     * success (200):
+     * 'id' => [
+            'type' => 'string',
+            'description' => 'User ID',
+            'example' => '88224979-406e-4e32-9458-55836e4e1f95'
+        ];
+     *  'income' => [
+            'type' => 'integer',
+            'description' => 'Monthly income',
+            'nullable' => true,
+            'example' => 499999
+        ];
+     *
+     * error/default (anything other than 200):
+     * 'code' => [
+            'type' => 'integer',
+            'description' => 'Error code',
+            'example' => 100
+        ];
+     *  'message' => [
+            'type' => 'string',
+            'description' => 'Error message',
+            'example' => 'Unexpected error'
+        ];
+     */
     private const USER_ACCOUNT_1 = [
         'id' => '332705c0-fadd-4663-ace4-6ea1c3297566',
-        'active' => true,
-        'interestRate' => 0.93,
-        'income' => 200,
-        'amount' => 200,
-        'created' => ''
+        'income' => 20000
     ];
 
     private const USER_ACCOUNT_2 = [
         'id' => '3567bd11-03c5-44ad-ae5d-5021ac26d210',
-        'active' => true,
-        'interestRate' => 1.02,
-        'income' => 6000,
-        'amount' => 6000,
+        'income' => 600000 // £6000, but in pence.
     ];
 
     private const USER_ACCOUNT_3 = [
         'id' => 'e0c1c412-823e-4af8-b256-2d1c22b3b376',
-        'active' => true,
-        'interestRate' => 0.5,
-        'income' => null,
-        'amount' => 0
+        'income' => null
     ];
 
     private const USER_ACCOUNT_4 = [
         'id' => '3d676dc7-ed2c-447c-8eb9-8cd8c5e86279',
-        'active' => false,
-        'income' => 999999,
-        'amount' => 0
+        'income' => 999999
     ];
 
     private const USER_ACCOUNT_5 = [
         'id' => '46437aa0-2386-4c90-b789-8513a47fda27',
-        'active' => true,
-        'interestRate' => 0.93,
-        'income' => 200,
-        'amount' => 200,
+        'income' => 20000
     ];
 
     /**
@@ -88,18 +103,12 @@ class StatisticsEndpoint {
      * @return array(statusCode, body)
      */
     public function sendRequest($request) {
-
-        print_r("Send Request: ");
-        print_r($request);
-
         switch($request['path']){
             case 'users/':
-                $function = $request['method'] == 'GET' ? 'createAccount' : 'getAccount';
+                $function = $request['method'] == 'POST' ? 'createAccount' : 'getAccount';
         }
 
-        print_r($function);
-
-        return $this->generateResponse($this->$function($request['body']));
+        return $this->generateResponse($this->$function(trim($request['body'], "\"")));
     }
 
     private function createAccount($userID) {
@@ -111,7 +120,7 @@ class StatisticsEndpoint {
 
     private function getAccount($userID) {
         if(array_any($this->existingUserAccounts, fn($account) => $account['id'] == $userID)){
-            return ['code' => 200, 'body' =>  array_find($this->newUserAccounts, fn($account) => $account['id'] == $userID)];
+            return ['code' => 200, 'body' =>  array_find($this->existingUserAccounts, fn($account) => $account['id'] == $userID)];
         }
         return ['code' => 404, 'body' =>  'Account not found'];
     }
