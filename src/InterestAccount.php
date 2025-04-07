@@ -113,6 +113,21 @@ class InterestAccount {
         $this->balance = $balance;
     }
 
+    /**
+     * User's transaction log. 
+     *
+     * @var array(string name, int amount)
+     */
+    private array $transactions = [];
+
+    public function getTransactions() {
+        return $this->transactions;
+    }
+
+    public function setTransactions(array $transactions) {
+        $this->transactions = $transactions;
+    }
+
     //endregion
 
     public function __construct()
@@ -126,10 +141,7 @@ class InterestAccount {
      * @param string $userID In UUIDv4 format.
      */
     public function newAccount(string $userID) {
-        // If the User ID is absent, return a failure.
-        if(!$userID){
-            throw new \Exception('No userID');
-        }
+        $this->validateUserID($userID);
 
         // Attempt to fetch a user's income via the endpoint.
         $this->handleUserResponse($this->statisticsAPIHandler('user', $userID, true));
@@ -144,11 +156,31 @@ class InterestAccount {
      * @param array $account
      */
     public function setAccount($account) {
+        // Ensure legitimate account.
+        $this->validateUserID($account['id']);
+
         // Attempt to get a userID via the endpoint.
         $this->setUserID($account['id']);
         $this->setIncome($account['income']);
         $this->setBalance($account['balance']);
         $this->setInterestRate($account['interestRate']);
+        if($account['transactions']) {
+            $this->transactions = $account['transactions'];
+        }
+    }
+
+    /**
+     * Validate a given User ID string to ensure it is in a UUIDv4 format, and not ''.
+     *
+     * @param string $userID
+     * @return void
+     */
+    private function validateUserID(string $userID) {
+        // Validate the given user ID to be in UUIDv4 format.
+        if(!preg_match('/^[[:xdigit:]]{8}(?:\-[[:xdigit:]]{4}){3}\-[[:xdigit:]]{12}$/',
+            $userID)) {
+            throw new \Exception('User ID is not in UUIDv4 format.');
+        }
     }
 
     /**
@@ -158,10 +190,10 @@ class InterestAccount {
      */
     public function getAccount() {
         return [
-            $this->getUserID(),
-            $this->getBalance(),
-            $this->getInterestRate(),
-            $this->getIncome()
+            'id' => $this->getUserID(),
+            'balance' => $this->getBalance(),
+            'interestRate' => $this->getInterestRate(),
+            'income' => $this->getIncome()
         ];
     }
 
@@ -261,7 +293,7 @@ class InterestAccount {
             if($interest > 1){
                 // Round down partial pennies to 0.
                 $interest = floor($interest);
-                $this->balance += $interest;
+                $this->depositFunds($interest, true);
                 $this->delayedInterest = 0;
             } else {
                 $this->delayedInterest = $interest;
@@ -295,27 +327,15 @@ class InterestAccount {
         return $threeDayRate;
     }
 
-    private array $newTransactions = [];
-
     /**
      * Log a transaction.
      *
-     * @param int $interest
      * @param string $type
+     * @param int $interest
      * @return void
      */
-    private function logNewTransaction($interest, $type) {
-        array_push($this->newTransactions, [$type, $interest]);
-    }
-
-    /**
-     * List all of an account's transactions, including interest/deposit payments.
-     * @param ?array $existingTransactions A list of the account's existing transactions.
-     * @return array()
-     */
-    public function listTransactions($existingTransactions = []) {
-
-        return array_push($existingTransactions, $this->newTransactions);
+    private function logNewTransaction($type, $interest) {
+        array_push($this->transactions, [$type, $interest]);
     }
 
     /**
