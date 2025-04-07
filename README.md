@@ -5,7 +5,7 @@
 - From the base folder in Terminal:
 - Run `make build` to build the container and all of the dependencies.
 - Run `make up` to run the Docker container.
-- Run `make install` to install all composer dependencies. (Shouldn't take long as there aren't many).
+- (Optional) Run `make install` to install all composer dependencies, and upgrade them if required `make update`. (Shouldn't take long as there aren't many).
 
 # Testing
 - Run `make run-test` to run the PHPUnit tests.
@@ -38,7 +38,7 @@ I'm quite confident that I've done everything the test asks for, and I've writte
 - The Stats API would identify whether an account has already been made or not, returning an error response when asking for a new account's details.
     - If this is not the case, the user would not be able to try creating a new account, as this should be validated beforehand. If the library *can* be called to create a new account and should perform verification, this can easily be added with a boolean (such as activeAccount) check, or similar.
 - Interest rate remaining constant means that it just cannot be changed once set.
-- As balance is stored in pennies, *and* interest <1p isn't applied, I've floored applyable interest to remove the decimals. I considered passing the decimal value onwards to the next payment, but that was not stipulated in the test requirements. However, I know that there are a number of different accepted ways of handling fractions of pennies, including to five decimal places.
+- As balance is stored in pennies, *and* interest <1p isn't applied, I've floored applyable interest to remove the decimals. I considered passing the remaining decimal value onwards to the next payment, but that was not stipulated in the test requirements. However, I know that there are a number of different accepted ways of handling fractions of pennies, including to five decimal places.
 - I have taken the possibility of a leap year into account regarding annual interest rate, and allowed a forced override one way or the other for testing purposes.
 - I would expect that normally, the interest calculation happenening everything three days would be called via some form of Chronjob or similar. However, as the requirements stipulate "interest calculation and payout happens every three days", I took this to mean that it could be calculated in bulk and ran this in a loop. I could have passed in a from date and to date rather than days, but that would have only amounted to an extra calculation, not much difference and arguably would have been calculated beforehand.
 - Deposits also list as transactions, and the interest payout runs through this.
