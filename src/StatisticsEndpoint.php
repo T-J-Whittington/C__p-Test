@@ -3,17 +3,17 @@
 namespace ChipTest;
 
 /**
- * This class is purely to mock up the API endpoint and is not/will not be a part of 
+ * This class is purely to mock up the API endpoint and is not/will not be a part of
  * the codebase once that endpoint is properly implemented.
  */
-class StatisticsEndpoint {
-
+class StatisticsEndpoint
+{
     // Mock user accounts.
     // According to the Stastics API doc, successes return only ID and Income.
     // Errors only return a not-200 code and a message.
 
     /*
-     * API response examples: 
+     * API response examples:
      * success (200):
      * 'id' => [
             'type' => 'string',
@@ -90,7 +90,8 @@ class StatisticsEndpoint {
     /**
      * Function to generate an API-like response, with a statusCode and a body.
      */
-    private function generateResponse($return) {
+    private function generateResponse($return)
+    {
         return [
             'statusCode' => $return['code'],
             'body' => json_encode($return['body'])
@@ -102,8 +103,9 @@ class StatisticsEndpoint {
      * @param array $request[method, endpoint, body]
      * @return array(statusCode, body)
      */
-    public function sendRequest($request) {
-        switch($request['path']){
+    public function sendRequest($request)
+    {
+        switch ($request['path']) {
             case 'users/':
                 $function = $request['method'] == 'POST' ? 'createAccount' : 'getAccount';
         }
@@ -111,18 +113,20 @@ class StatisticsEndpoint {
         return $this->generateResponse($this->$function(trim($request['body'], "\"")));
     }
 
-    private function createAccount($userID) {
-        if(array_any($this->existingUserAccounts, fn($account) => $account['id'] == $userID)){
+    private function createAccount($userID)
+    {
+        if (array_any($this->existingUserAccounts, fn($account) => $account['id'] == $userID)) {
             return(['code' => 100, 'body' => 'User Account exists.']);
         }
         return ['code' => 200, 'body' => array_find($this->newUserAccounts, fn($account) => $account['id'] == $userID)];
     }
 
-    private function getAccount($userID) {
-        if(array_any($this->existingUserAccounts, fn($account) => $account['id'] == $userID)){
-            return ['code' => 200, 'body' =>  array_find($this->existingUserAccounts, fn($account) => $account['id'] == $userID)];
+    private function getAccount($userID)
+    {
+        if (array_any($this->existingUserAccounts, fn($account) => $account['id'] == $userID)) {
+            return ['code' => 200,
+                'body' =>  array_find($this->existingUserAccounts, fn($account) => $account['id'] == $userID)];
         }
         return ['code' => 404, 'body' =>  'Account not found'];
     }
-
 }
