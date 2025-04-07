@@ -62,14 +62,14 @@ class InterestAccount
      */
     private ?string $userID;
 
-    public function getUserID()
+    public function getUserID(): ?string
     {
         return $this->userID;
     }
 
     public function setUserID(string $userID)
     {
-        return $this->userID = $userID;
+        $this->userID = $userID;
     }
 
     /**
@@ -78,7 +78,7 @@ class InterestAccount
      */
     private ?int $income;
 
-    public function getIncome()
+    public function getIncome(): ?int
     {
         return $this->income;
     }
@@ -94,7 +94,7 @@ class InterestAccount
      */
     private ?float $interestRate;
 
-    public function getInterestRate()
+    public function getInterestRate(): ?float
     {
         return $this->interestRate;
     }
@@ -111,7 +111,7 @@ class InterestAccount
      */
     private ?int $balance;
 
-    public function getBalance()
+    public function getBalance(): ?int
     {
         return $this->balance;
     }
@@ -128,7 +128,7 @@ class InterestAccount
      */
     private array $transactions = [];
 
-    public function getTransactions()
+    public function getTransactions(): array
     {
         return $this->transactions;
     }
@@ -149,8 +149,9 @@ class InterestAccount
     /**
      * Create a new account associated to the current $userID.
      * @param string $userID In UUIDv4 format.
+     * @return array(string userID, float interestRate)
      */
-    public function newAccount(string $userID)
+    public function newAccount(string $userID): array
     {
         $this->validateUserID($userID);
 
@@ -203,9 +204,9 @@ class InterestAccount
     /**
      * Get the currently set account details.
      *
-     * @return void
+     * @return array
      */
-    public function getAccount()
+    public function getAccount(): array
     {
         return [
             'id' => $this->getUserID(),
@@ -255,7 +256,7 @@ class InterestAccount
      * @param bool $fromInterest Whether the deposit function is called by the interest function.
      * @return $account
      */
-    public function depositFunds(int $funds, bool $fromInterest = false)
+    public function depositFunds(int $funds, bool $fromInterest = false): array
     {
         $this->balance += $funds;
 
@@ -297,7 +298,7 @@ class InterestAccount
      * Null for normal leap year checking, boolean to force leap year or not.
      * @return $account Account with new amount
      */
-    public function calculateInterest(int $days, ?bool $overrideLeapYear = null)
+    public function calculateInterest(int $days, ?bool $overrideLeapYear = null): array
     {
         $this->delayedInterest = 0;
         $this->overrideLeapYear = $overrideLeapYear;
@@ -332,7 +333,7 @@ class InterestAccount
      *
      * @return float
      */
-    private function deriveInterestRateFromAccountRate()
+    private function deriveInterestRateFromAccountRate(): float
     {
         $derivedConstantInterestRate = array_find(
             $this::INTEREST_RATES,
