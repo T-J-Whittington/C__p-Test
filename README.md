@@ -50,3 +50,7 @@ The code has been linted to match PSR12 standards.
 I haven't embellished my commits, I genuinely treat commits like a form of patch notes and try to keep to the proper git conventions, including the commit message character limit. I'll only add a commit message and no description if the change was small enough to summarise in the message. I dislike seeing an enormous commit message with no description.
 
 Thank you for the test, and taking the time to review my work.
+
+
+# New reader comments:
+This is an obfuscated test for a company.
